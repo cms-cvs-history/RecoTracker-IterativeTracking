@@ -1,0 +1,170 @@
+##HIT REMOVAL
+module secClusters = RemainingClusterProducer{
+    InputTag matchedRecHits    = siStripMatchedRecHits:matchedRecHit
+    InputTag rphirecHits       = siStripMatchedRecHits:rphiRecHit
+    InputTag stereorecHits     = siStripMatchedRecHits:stereoRecHit
+    InputTag pixelHits         = siPixelRecHits:
+    InputTag recTracks         = highPurityTracks:
+}
+
+##TRACKER HITS
+    
+module secPixelRecHits =
+  siPixelRecHits from "RecoLocalTracker/SiPixelRecHits/data/SiPixelRecHits.cfi"
+replace secPixelRecHits.src=secClusters:
+
+
+module secStripRecHits = 
+  siStripMatchedRecHits from "RecoLocalTracker/SiStripRecHitConverter/data/SiStripRecHitConverter.cfi"
+replace secStripRecHits.ClusterProducer = "secClusters"
+
+    
+
+##SEEDING LAYERS
+#PAIRS
+es_module seclayerPairs =  MixedLayerPairsESProducer {
+
+  string ComponentName = "SecLayerPairs"
+
+  vstring layerList = { "BPix1+BPix2", "BPix1+BPix3", "BPix2+BPix3",
+                        "BPix1+FPix1_pos", "BPix1+FPix1_neg", "BPix1+FPix2_pos", "BPix1+FPix2_neg",
+                        "BPix2+FPix1_pos", "BPix2+FPix1_neg", "BPix2+FPix2_pos", "BPix2+FPix2_neg",
+                        "FPix1_pos+FPix2_pos", "FPix1_neg+FPix2_neg",
+                        "FPix2_pos+TEC1_pos","FPix2_pos+TEC2_pos","TEC1_pos+TEC2_pos","TEC2_pos+TEC3_pos",
+                        "FPix2_neg+TEC1_neg","FPix2_neg+TEC2_neg","TEC1_neg+TEC2_neg","TEC2_neg+TEC3_neg"
+                        }
+
+  PSet BPix = {
+    string HitProducer = "secPixelRecHits"  
+    string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
+    untracked bool useErrorsFromParam = true
+    double hitErrorRPhi = 0.0027  
+    double hitErrorRZ   = 0.0060 
+  }
+
+  PSet FPix = {
+    string HitProducer = "secPixelRecHits"  
+    string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
+    untracked bool useErrorsFromParam = true
+    double hitErrorRPhi = 0.0051 
+    double hitErrorRZ   = 0.0036  
+  }
+
+  PSet TEC = {
+    InputTag matchedRecHits = secStripRecHits:matchedRecHit
+    string TTRHBuilder        =  "WithTrackAngle"
+    untracked bool useRingSlector = true
+    int32 minRing = 1
+    int32 maxRing = 1
+  }
+
+}
+
+
+
+#TRIPLETS
+
+
+es_module seclayertriplets =  PixelLayerTripletsESProducer {
+
+  string ComponentName = "SecLayerTriplets"
+
+  vstring layerList = { "BPix1+BPix2+BPix3",
+                        "BPix1+BPix2+FPix1_pos",
+                        "BPix1+BPix2+FPix1_neg",
+                        "BPix1+FPix1_pos+FPix2_pos",
+                        "BPix1+FPix1_neg+FPix2_neg"
+  }
+  PSet BPix = {
+    string HitProducer = "secPixelRecHits"
+    string TTRHBuilder = "TTRHBuilderWithoutAngle4PixelTriplets"
+    untracked bool useErrorsFromParam = true
+    double hitErrorRPhi = 0.0027
+    double hitErrorRZ   = 0.0060
+  }
+
+  PSet FPix = {
+    string HitProducer = "secPixelRecHits"
+    string TTRHBuilder = "TTRHBuilderWithoutAngle4PixelTriplets"
+    untracked bool useErrorsFromParam = true
+    double hitErrorRPhi = 0.0051
+    double hitErrorRZ   = 0.0036
+  }
+}
+
+
+
+
+##SEEDS
+#TRIPLETS
+module secTriplets = globalSeedsFromTripletsWithVertices
+from "RecoTracker/TkSeedGenerator/data/GlobalSeedsFromTripletsWithVertices.cfi"
+replace secTriplets.RegionFactoryPSet.RegionPSet.originHalfLength = 22.7
+replace secTriplets.OrderedHitsFactoryPSet.SeedingLayers = "SecLayerTriplets"
+replace secTriplets.RegionFactoryPSet.RegionPSet.ptMin = 0.3
+
+
+
+
+
+##TRAJECTORY MEASUREMENT
+es_module secMeasurementTracker =
+   MeasurementTracker from "RecoTracker/MeasurementDet/data/MeasurementTrackerESProducer.cfi"
+replace secMeasurementTracker.ComponentName = "secMeasurementTracker"
+replace secMeasurementTracker.pixelClusterProducer = "secClusters"
+replace secMeasurementTracker.stripClusterProducer = "secClusters"
+
+
+##TRAJECTORY FILTER
+es_module secCkfTrajectoryFilter = trajectoryFilterESProducer from "TrackingTools/TrajectoryFiltering/data/TrajectoryFilterESProducer.cfi"
+replace secCkfTrajectoryFilter.ComponentName = "secCkfTrajectoryFilter"
+replace secCkfTrajectoryFilter.filterPset.maxLostHits = 1
+replace secCkfTrajectoryFilter.filterPset.minimumNumberOfHits = 3
+replace secCkfTrajectoryFilter.filterPset.minPt   = 0.3
+
+##TRAJECTORY BUILDER
+es_module secCkfTrajectoryBuilder =
+   GroupedCkfTrajectoryBuilder from "RecoTracker/CkfPattern/data/GroupedCkfTrajectoryBuilderESProducer.cfi"
+replace secCkfTrajectoryBuilder.ComponentName = "secCkfTrajectoryBuilder"
+replace secCkfTrajectoryBuilder.MeasurementTrackerName = "secMeasurementTracker"
+replace secCkfTrajectoryBuilder.trajectoryFilterName = "secCkfTrajectoryFilter"
+
+
+##TRACK CANDIDATES
+module secTrackCandidates =
+   ckfTrackCandidates from "RecoTracker/CkfPattern/data/CkfTrackCandidates.cfi"
+replace secTrackCandidates.SeedProducer= "secTriplets"
+replace secTrackCandidates.TrajectoryBuilder = "secCkfTrajectoryBuilder"
+
+
+##TRACKS
+module secWithMaterialTracks = 
+  ctfWithMaterialTracks from "RecoTracker/TrackProducer/data/CTFFinalFitWithMaterial.cfi"
+replace  secWithMaterialTracks.src ="secTrackCandidates"       
+
+
+
+
+
+module secStep=VertexFilter{
+    bool VertexCut =true
+    InputTag recTracks     = secWithMaterialTracks:
+    int32 MinHits             = 3
+    double DistZFromVertex    = 0.4
+    double DistRhoFromVertex  = 0.1
+    double ChiCut             = 130
+    InputTag recVertices      = pixelVertices:
+}
+
+
+sequence secondStep ={
+    secClusters
+    ,secPixelRecHits
+    ,secStripRecHits
+    ,secTriplets
+    ,secTrackCandidates
+    ,secWithMaterialTracks
+    ,secStep
+}
+
+
