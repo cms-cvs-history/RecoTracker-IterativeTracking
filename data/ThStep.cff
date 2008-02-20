@@ -1,0 +1,149 @@
+##HIT REMOVAL
+module thClusters = RemainingClusterProducer{
+    InputTag matchedRecHits    = secStripRecHits:matchedRecHit
+    InputTag rphirecHits       = secStripRecHits:rphiRecHit
+    InputTag stereorecHits     = secStripRecHits:stereoRecHit
+    InputTag pixelHits         = secPixelRecHits:
+    InputTag recTracks         = secStep:
+}
+
+##TRACKER HITS
+    
+module thPixelRecHits =
+  siPixelRecHits from "RecoLocalTracker/SiPixelRecHits/data/SiPixelRecHits.cfi"
+replace thPixelRecHits.src= thClusters
+
+
+module thStripRecHits = 
+  siStripMatchedRecHits from "RecoLocalTracker/SiStripRecHitConverter/data/SiStripRecHitConverter.cfi"
+replace thStripRecHits.ClusterProducer = "thClusters"
+
+    
+
+##SEEDING LAYERS
+
+
+es_module thlayerpairs =  MixedLayerPairsESProducer {
+
+  string ComponentName = "ThLayerPairs"
+
+    vstring layerList = { "BPix1+BPix2", "BPix1+BPix3", "BPix2+BPix3",
+	"BPix1+FPix1_pos", "BPix1+FPix1_neg", "BPix1+FPix2_pos", "BPix1+FPix2_neg",
+	"BPix2+FPix1_pos", "BPix2+FPix1_neg", "BPix2+FPix2_pos", "BPix2+FPix2_neg",
+	"FPix1_pos+FPix2_pos", "FPix1_neg+FPix2_neg",
+	"FPix2_pos+TEC1_pos","FPix2_pos+TEC2_pos","TEC1_pos+TEC2_pos","TEC2_pos+TEC3_pos",
+	"FPix2_neg+TEC1_neg","FPix2_neg+TEC2_neg","TEC1_neg+TEC2_neg","TEC2_neg+TEC3_neg",
+	#PIXELLESS
+	"TIB1+TIB2"
+    }
+    
+  PSet BPix = {
+    string HitProducer = "thPixelRecHits"  
+    string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
+    untracked bool useErrorsFromParam = true
+    double hitErrorRPhi = 0.0027  
+    double hitErrorRZ   = 0.0060 
+  }
+
+  PSet FPix = {
+    string HitProducer = "thPixelRecHits"  
+    string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
+    untracked bool useErrorsFromParam = true
+    double hitErrorRPhi = 0.0051 
+    double hitErrorRZ   = 0.0036  
+  }
+###PIXELLESS
+  PSet TIB1 = {
+    InputTag matchedRecHits = thStripRecHits:matchedRecHit
+    InputTag rphiRecHits    = thStripRecHits:rphiRecHit
+    untracked bool useSimpleRphiHitsCleaner = false
+    string TTRHBuilder        =  "WithTrackAngle"
+  }
+
+  PSet TIB2 = {
+    InputTag matchedRecHits = thStripRecHits:matchedRecHit
+    InputTag rphiRecHits    = thStripRecHits:rphiRecHit
+    untracked bool useSimpleRphiHitsCleaner = false
+    string TTRHBuilder        =  "WithTrackAngle"
+  }
+
+
+###END PIXELLESS
+  PSet TEC = {
+    InputTag matchedRecHits = thStripRecHits:matchedRecHit
+    string TTRHBuilder        =  "WithTrackAngle"
+    untracked bool useRingSlector = true
+    int32 minRing = 1
+    int32 maxRing = 1
+  }
+
+}
+
+
+
+
+
+#SEEDS
+module thPLSeeds  =  globalMixedSeeds from 
+"RecoTracker/TkSeedGenerator/data/GlobalMixedSeeds.cfi"
+replace thPLSeeds.OrderedHitsFactoryPSet.SeedingLayers = "ThLayerPairs"
+replace thPLSeeds.RegionFactoryPSet.RegionPSet.ptMin = 0.3
+replace thPLSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 22.7
+ 
+
+
+##TRAJECTORY MEASUREMENT
+es_module thMeasurementTracker =
+   MeasurementTracker from "RecoTracker/MeasurementDet/data/MeasurementTrackerESProducer.cfi"
+replace thMeasurementTracker.ComponentName = "thMeasurementTracker"
+replace thMeasurementTracker.pixelClusterProducer = "thClusters"
+replace thMeasurementTracker.stripClusterProducer = "thClusters"
+
+##TRAJECTORY FILTER
+es_module thCkfTrajectoryFilter = trajectoryFilterESProducer from "TrackingTools/TrajectoryFiltering/data/TrajectoryFilterESProducer.cfi"
+replace thCkfTrajectoryFilter.ComponentName = "thCkfTrajectoryFilter"
+replace thCkfTrajectoryFilter.filterPset.maxLostHits = 1
+replace thCkfTrajectoryFilter.filterPset.minimumNumberOfHits = 5
+replace thCkfTrajectoryFilter.filterPset.minPt   = 0.3
+##TRAJECTORY BUILDER
+es_module thCkfTrajectoryBuilder =
+   GroupedCkfTrajectoryBuilder from "RecoTracker/CkfPattern/data/GroupedCkfTrajectoryBuilderESProducer.cfi"
+replace thCkfTrajectoryBuilder.ComponentName = "thCkfTrajectoryBuilder"
+replace thCkfTrajectoryBuilder.MeasurementTrackerName = "thMeasurementTracker"
+replace thCkfTrajectoryBuilder.trajectoryFilterName = "thCkfTrajectoryFilter"
+
+##TRACK CANDIDATES
+module thTrackCandidates =
+   ckfTrackCandidates from "RecoTracker/CkfPattern/data/CkfTrackCandidates.cfi"
+replace thTrackCandidates.SeedProducer= "thPLSeeds"
+replace thTrackCandidates.TrajectoryBuilder = "thCkfTrajectoryBuilder"
+
+
+##TRACKS
+module thWithMaterialTracks = 
+  ctfWithMaterialTracks from "RecoTracker/TrackProducer/data/CTFFinalFitWithMaterial.cfi"
+replace  thWithMaterialTracks.src ="thTrackCandidates"       
+    
+
+
+module thStep=VertexFilter{
+    bool VertexCut =true
+    InputTag recTracks     = thWithMaterialTracks:
+    int32 MinHits             = 3
+    double DistZFromVertex    = 0.1
+    double DistRhoFromVertex  = 0.1
+    double ChiCut             = 250000
+    InputTag recVertices      = pixelVertices:
+ 
+}
+
+
+sequence thirdStep ={
+    thClusters
+    ,thPixelRecHits
+    ,thStripRecHits
+    ,thPLSeeds
+    ,thTrackCandidates
+    ,thWithMaterialTracks
+    ,thStep
+}
