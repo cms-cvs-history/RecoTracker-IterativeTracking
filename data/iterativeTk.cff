@@ -1,7 +1,7 @@
 module highPurityTracks = selectCKF from "RecoTracker/FinalTrackSelectors/data/selectCKF.cfi"
 replace highPurityTracks.src = preFilterCmsTracks
 replace highPurityTracks.copyTrajectories =true
-replace highPurityTracks.minNumberHits = 5
+replace highPurityTracks.trackerLayersWithMeasurement() = 5
 include "RecoTracker/IterativeTracking/data/SecStep.cff"
 include "RecoTracker/IterativeTracking/data/ThStep.cff"
 sequence iterTracking ={highPurityTracks,secondStep,thirdStep}
