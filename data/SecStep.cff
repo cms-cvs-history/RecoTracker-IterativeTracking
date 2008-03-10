@@ -4,7 +4,7 @@ module secClusters = RemainingClusterProducer{
     InputTag rphirecHits       = siStripMatchedRecHits:rphiRecHit
     InputTag stereorecHits     = siStripMatchedRecHits:stereoRecHit
     InputTag pixelHits         = siPixelRecHits:
-    InputTag recTracks         = highPurityTracks:
+    InputTag recTracks         = firstfilter:
 }
 
 ##TRACKER HITS
