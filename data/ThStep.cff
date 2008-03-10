@@ -134,7 +134,9 @@ module thStep=VertexFilter{
     double DistRhoFromVertex  = 0.1
     double ChiCut             = 250000
     InputTag recVertices      = pixelVertices:
- 
+    bool UseQuality = true
+    string TrackQuality ="highPurity"
+
 }
 
 
