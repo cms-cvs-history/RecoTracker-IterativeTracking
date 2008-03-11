@@ -32,40 +32,60 @@ replace secStripRecHits.ClusterProducer = "secClusters"
 #PAIRS
 es_module seclayerPairs =  MixedLayerPairsESProducer {
 
-  string ComponentName = "SecLayerPairs"
-
-  vstring layerList = { "BPix1+BPix2", "BPix1+BPix3", "BPix2+BPix3",
-                        "BPix1+FPix1_pos", "BPix1+FPix1_neg", "BPix1+FPix2_pos", "BPix1+FPix2_neg",
-                        "BPix2+FPix1_pos", "BPix2+FPix1_neg", "BPix2+FPix2_pos", "BPix2+FPix2_neg",
-                        "FPix1_pos+FPix2_pos", "FPix1_neg+FPix2_neg",
-                        "FPix2_pos+TEC1_pos","FPix2_pos+TEC2_pos","TEC1_pos+TEC2_pos","TEC2_pos+TEC3_pos",
-                        "FPix2_neg+TEC1_neg","FPix2_neg+TEC2_neg","TEC1_neg+TEC2_neg","TEC2_neg+TEC3_neg"
-                        }
-
-  PSet BPix = {
-    string HitProducer = "secPixelRecHits"  
-    string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
-    untracked bool useErrorsFromParam = true
-    double hitErrorRPhi = 0.0027  
-    double hitErrorRZ   = 0.0060 
-  }
-
-  PSet FPix = {
-    string HitProducer = "secPixelRecHits"  
-    string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
-    untracked bool useErrorsFromParam = true
-    double hitErrorRPhi = 0.0051 
-    double hitErrorRZ   = 0.0036  
-  }
-
-  PSet TEC = {
-    InputTag matchedRecHits = secStripRecHits:matchedRecHit
-    string TTRHBuilder        =  "WithTrackAngle"
-    untracked bool useRingSlector = true
-    int32 minRing = 1
-    int32 maxRing = 1
-  }
-
+    string ComponentName = "SecLayerPairs"
+    
+    vstring layerList = { 
+	"BPix1+BPix2", "BPix1+BPix3", "BPix2+BPix3",
+	"BPix1+FPix1_pos", "BPix1+FPix1_neg", "BPix1+FPix2_pos", "BPix1+FPix2_neg",
+	"BPix2+FPix1_pos", "BPix2+FPix1_neg", "BPix2+FPix2_pos", "BPix2+FPix2_neg",
+	"FPix1_pos+FPix2_pos", "FPix1_neg+FPix2_neg",
+	"FPix2_pos+TEC1_pos","FPix2_pos+TEC2_pos","TEC1_pos+TEC2_pos","TEC2_pos+TEC3_pos",
+	"FPix2_neg+TEC1_neg","FPix2_neg+TEC2_neg","TEC1_neg+TEC2_neg","TEC2_neg+TEC3_neg",
+	"TIB1+TIB2+TIB3"
+    }
+    
+    PSet BPix = {
+	string HitProducer = "secPixelRecHits"  
+	string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
+	untracked bool useErrorsFromParam = true
+	double hitErrorRPhi = 0.0027  
+	double hitErrorRZ   = 0.0060 
+    }
+    
+    PSet FPix = {
+	string HitProducer = "secPixelRecHits"  
+	string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
+	untracked bool useErrorsFromParam = true
+	double hitErrorRPhi = 0.0051 
+	double hitErrorRZ   = 0.0036  
+    }
+    
+    PSet TEC = {
+	InputTag matchedRecHits = secStripRecHits:matchedRecHit
+	string TTRHBuilder        =  "WithTrackAngle"
+	untracked bool useRingSlector = true
+	int32 minRing = 1
+	int32 maxRing = 1
+    }
+    PSet TIB1 = {
+	InputTag matchedRecHits = secStripRecHits:matchedRecHit
+	InputTag rphiRecHits    = secStripRecHits:rphiRecHit
+	untracked bool useSimpleRphiHitsCleaner = false
+	string TTRHBuilder        =  "WithTrackAngle"
+    }
+    
+    PSet TIB2 = {
+	InputTag matchedRecHits = secStripRecHits:matchedRecHit
+	InputTag rphiRecHits    = secStripRecHits:rphiRecHit
+	untracked bool useSimpleRphiHitsCleaner = false
+	string TTRHBuilder        =  "WithTrackAngle"
+    }
+    PSet TIB3 = {
+#	InputTag matchedRecHits = secStripRecHits:matchedRecHit
+	InputTag rphiRecHits    = secStripRecHits:rphiRecHit
+	untracked bool useSimpleRphiHitsCleaner = false
+	string TTRHBuilder        =  "WithTrackAngle"
+    }
 }
 
 

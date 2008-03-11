@@ -41,9 +41,9 @@ es_module thlayerpairs =  MixedLayerPairsESProducer {
 	"BPix2+FPix1_pos", "BPix2+FPix1_neg", "BPix2+FPix2_pos", "BPix2+FPix2_neg",
 	"FPix1_pos+FPix2_pos", "FPix1_neg+FPix2_neg",
 	"FPix2_pos+TEC1_pos","FPix2_pos+TEC2_pos","TEC1_pos+TEC2_pos","TEC2_pos+TEC3_pos",
-	"FPix2_neg+TEC1_neg","FPix2_neg+TEC2_neg","TEC1_neg+TEC2_neg","TEC2_neg+TEC3_neg",
+	"FPix2_neg+TEC1_neg","FPix2_neg+TEC2_neg","TEC1_neg+TEC2_neg","TEC2_neg+TEC3_neg"
 	#PIXELLESS
-	"TIB1+TIB2"
+#	"TIB1+TIB2"
     }
     
   PSet BPix = {
