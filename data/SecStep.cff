@@ -1,11 +1,19 @@
 ##HIT REMOVAL
-module secClusters = RemainingClusterProducer{
-    InputTag matchedRecHits    = siStripMatchedRecHits:matchedRecHit
-    InputTag rphirecHits       = siStripMatchedRecHits:rphiRecHit
-    InputTag stereorecHits     = siStripMatchedRecHits:stereoRecHit
-    InputTag pixelHits         = siPixelRecHits:
-    InputTag recTracks         = firstfilter:
+#module secClusters = RemainingClusterProducer{
+#    InputTag matchedRecHits    = siStripMatchedRecHits:matchedRecHit
+#    InputTag rphirecHits       = siStripMatchedRecHits:rphiRecHit
+#    InputTag stereorecHits     = siStripMatchedRecHits:stereoRecHit
+#    InputTag pixelHits         = siPixelRecHits:
+#    InputTag recTracks         = firstfilter:
+#}
+module secClusters = TrackClusterRemover{
+    InputTag stripClusters = siStripClusters
+    InputTag pixelClusters = siPixelClusters
+    InputTag trajectories  = firstfilter
+    PSet Common = { double maxChi2 = 30.0  }
 }
+
+
 
 ##TRACKER HITS
     
@@ -141,7 +149,7 @@ replace secTrackCandidates.TrajectoryBuilder = "secCkfTrajectoryBuilder"
 module secWithMaterialTracks = 
   ctfWithMaterialTracks from "RecoTracker/TrackProducer/data/CTFFinalFitWithMaterial.cfi"
 replace  secWithMaterialTracks.src ="secTrackCandidates"       
-
+replace  secWithMaterialTracks.clusterRemovalInfo = secClusters
 
 
 

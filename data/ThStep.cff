@@ -1,11 +1,20 @@
 ##HIT REMOVAL
-module thClusters = RemainingClusterProducer{
-    InputTag matchedRecHits    = secStripRecHits:matchedRecHit
-    InputTag rphirecHits       = secStripRecHits:rphiRecHit
-    InputTag stereorecHits     = secStripRecHits:stereoRecHit
-    InputTag pixelHits         = secPixelRecHits:
-    InputTag recTracks         = secStep:
+#module thClusters = RemainingClusterProducer{
+#    InputTag matchedRecHits    = secStripRecHits:matchedRecHit
+#    InputTag rphirecHits       = secStripRecHits:rphiRecHit
+#    InputTag stereorecHits     = secStripRecHits:stereoRecHit
+#    InputTag pixelHits         = secPixelRecHits:
+#    InputTag recTracks         = secStep:
+#}
+
+module thClusters = TrackClusterRemover{
+    InputTag stripClusters = secClusters
+    InputTag pixelClusters = secClusters
+    InputTag trajectories  = secStep
+    InputTag oldClusterRemovalInfo = secClusters
+    PSet Common = { double maxChi2 = 30.0  }
 }
+
 
 ##TRACKER HITS
     
@@ -123,8 +132,7 @@ replace thTrackCandidates.TrajectoryBuilder = "thCkfTrajectoryBuilder"
 module thWithMaterialTracks = 
   ctfWithMaterialTracks from "RecoTracker/TrackProducer/data/CTFFinalFitWithMaterial.cfi"
 replace  thWithMaterialTracks.src ="thTrackCandidates"       
-    
-
+replace  thWithMaterialTracks.clusterRemovalInfo = thClusters
 
 module thStep=VertexFilter{
     bool VertexCut =true
