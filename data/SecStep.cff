@@ -155,7 +155,8 @@ module secStep=VertexFilter{
     double ChiCut             = 130
     InputTag recVertices      = pixelVertices:
     bool UseQuality = true
-    string TrackQuality ="highPurity"   
+    string TrackQuality ="highPurity"
+    string TrackAlgorithm="iter2"   
 }
 
 

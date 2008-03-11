@@ -1,4 +1,4 @@
 module firstfilter = QualityFilter{
-    InputTag recTracks         = highPurityTracks:
+    InputTag recTracks         = generalTracks:
     string TrackQuality        = "highPurity"
 }

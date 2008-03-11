@@ -136,7 +136,7 @@ module thStep=VertexFilter{
     InputTag recVertices      = pixelVertices:
     bool UseQuality = true
     string TrackQuality ="highPurity"
-
+    string TrackAlgorithm="iter3"
 }
 
 
