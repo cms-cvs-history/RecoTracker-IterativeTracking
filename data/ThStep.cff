@@ -131,7 +131,7 @@ replace thTrackCandidates.TrajectoryBuilder = "thCkfTrajectoryBuilder"
 ##TRACKS
 module thWithMaterialTracks = 
   ctfWithMaterialTracks from "RecoTracker/TrackProducer/data/CTFFinalFitWithMaterial.cfi"
-replace  thWithMaterialTracks.src ="thTrackCandidates"       
+replace  thWithMaterialTracks.src =thTrackCandidates       
 replace  thWithMaterialTracks.clusterRemovalInfo = thClusters
 
 module thStep=VertexFilter{

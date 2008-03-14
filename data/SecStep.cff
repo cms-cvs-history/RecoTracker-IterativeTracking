@@ -168,7 +168,7 @@ replace secTrackCandidates.TrajectoryBuilder = "secCkfTrajectoryBuilder"
 ##TRACKS
 module secWithMaterialTracks = 
   ctfWithMaterialTracks from "RecoTracker/TrackProducer/data/CTFFinalFitWithMaterial.cfi"
-replace  secWithMaterialTracks.src ="secTrackCandidates"       
+replace  secWithMaterialTracks.src =secTrackCandidates       
 replace  secWithMaterialTracks.clusterRemovalInfo = secClusters
 
 
