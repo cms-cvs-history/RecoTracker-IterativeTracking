@@ -1,0 +1,2 @@
+module secStep =
+ vertFilter from "RecoParticleFlow/PFTracking/data/vertexFilter.cfi"

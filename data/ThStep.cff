@@ -112,7 +112,7 @@ replace thMeasurementTracker.stripClusterProducer = "thClusters"
 es_module thCkfTrajectoryFilter = trajectoryFilterESProducer from "TrackingTools/TrajectoryFiltering/data/TrajectoryFilterESProducer.cfi"
 replace thCkfTrajectoryFilter.ComponentName = "thCkfTrajectoryFilter"
 replace thCkfTrajectoryFilter.filterPset.maxLostHits = 1
-replace thCkfTrajectoryFilter.filterPset.minimumNumberOfHits = 5
+replace thCkfTrajectoryFilter.filterPset.minimumNumberOfHits = 3
 replace thCkfTrajectoryFilter.filterPset.minPt   = 0.3
 ##TRAJECTORY BUILDER
 es_module thCkfTrajectoryBuilder =
@@ -135,12 +135,8 @@ replace  thWithMaterialTracks.src =thTrackCandidates
 replace  thWithMaterialTracks.clusterRemovalInfo = thClusters
 
 
-module thStep =
- vertFilter from "RecoParticleFlow/PFTracking/data/vertexFilter.cfi"
-replace  thStep.recTracks     = thWithMaterialTracks:
-replace  thStep.DistZFromVertex    = 0.1
-replace  thStep.TrackAlgorithm="iter3"
 
+include "RecoTracker/IterativeTracking/data/ThVxFilter.cff"
 
 sequence thirdStep ={
     thClusters

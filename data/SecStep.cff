@@ -173,10 +173,9 @@ replace  secWithMaterialTracks.clusterRemovalInfo = secClusters
 
 
 ##FINAL TRACKS
-module secStep =
- vertFilter from "RecoParticleFlow/PFTracking/data/vertexFilter.cfi"
 
 
+include "RecoTracker/IterativeTracking/data/SecVxFilter.cff"
 
 sequence secondStep ={
     secClusters
