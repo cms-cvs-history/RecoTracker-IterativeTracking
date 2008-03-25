@@ -134,18 +134,12 @@ module thWithMaterialTracks =
 replace  thWithMaterialTracks.src =thTrackCandidates       
 replace  thWithMaterialTracks.clusterRemovalInfo = thClusters
 
-module thStep=VertexFilter{
-    bool VertexCut =true
-    InputTag recTracks     = thWithMaterialTracks:
-    int32 MinHits             = 3
-    double DistZFromVertex    = 0.1
-    double DistRhoFromVertex  = 0.1
-    double ChiCut             = 250000
-    InputTag recVertices      = pixelVertices:
-    bool UseQuality = true
-    string TrackQuality ="highPurity"
-    string TrackAlgorithm="iter3"
-}
+
+module thStep =
+ vertFilter from "RecoParticleFlow/PFTracking/data/vertexFilter.cfi"
+replace  thStep.recTracks     = thWithMaterialTracks:
+replace  thStep.DistZFromVertex    = 0.1
+replace  thStep.TrackAlgorithm="iter3"
 
 
 sequence thirdStep ={
