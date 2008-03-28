@@ -112,7 +112,7 @@ replace thMeasurementTracker.stripClusterProducer = "thClusters"
 es_module thCkfTrajectoryFilter = trajectoryFilterESProducer from "TrackingTools/TrajectoryFiltering/data/TrajectoryFilterESProducer.cfi"
 replace thCkfTrajectoryFilter.ComponentName = "thCkfTrajectoryFilter"
 replace thCkfTrajectoryFilter.filterPset.maxLostHits = 1
-replace thCkfTrajectoryFilter.filterPset.minimumNumberOfHits = 3
+replace thCkfTrajectoryFilter.filterPset.minimumNumberOfHits = 5
 replace thCkfTrajectoryFilter.filterPset.minPt   = 0.3
 ##TRAJECTORY BUILDER
 es_module thCkfTrajectoryBuilder =
@@ -131,12 +131,22 @@ replace thTrackCandidates.TrajectoryBuilder = "thCkfTrajectoryBuilder"
 ##TRACKS
 module thWithMaterialTracks = 
   ctfWithMaterialTracks from "RecoTracker/TrackProducer/data/CTFFinalFitWithMaterial.cfi"
-replace  thWithMaterialTracks.src =thTrackCandidates       
+replace  thWithMaterialTracks.src ="thTrackCandidates"       
 replace  thWithMaterialTracks.clusterRemovalInfo = thClusters
 
+module thStep=VertexFilter{
+    bool VertexCut =true
+    InputTag recTracks     = thWithMaterialTracks:
+    int32 MinHits             = 3
+    double DistZFromVertex    = 0.1
+    double DistRhoFromVertex  = 0.1
+    double ChiCut             = 250000
+    InputTag recVertices      = pixelVertices:
+    bool UseQuality = true
+    string TrackQuality ="highPurity"
+    string TrackAlgorithm="iter3"
+}
 
-
-include "RecoTracker/IterativeTracking/data/ThVxFilter.cff"
 
 sequence thirdStep ={
     thClusters

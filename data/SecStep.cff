@@ -168,14 +168,25 @@ replace secTrackCandidates.TrajectoryBuilder = "secCkfTrajectoryBuilder"
 ##TRACKS
 module secWithMaterialTracks = 
   ctfWithMaterialTracks from "RecoTracker/TrackProducer/data/CTFFinalFitWithMaterial.cfi"
-replace  secWithMaterialTracks.src =secTrackCandidates       
+replace  secWithMaterialTracks.src ="secTrackCandidates"       
 replace  secWithMaterialTracks.clusterRemovalInfo = secClusters
 
 
-##FINAL TRACKS
 
 
-include "RecoTracker/IterativeTracking/data/SecVxFilter.cff"
+module secStep=VertexFilter{
+    bool VertexCut =true
+    InputTag recTracks     = secWithMaterialTracks:
+    int32 MinHits             = 3
+    double DistZFromVertex    = 0.4
+    double DistRhoFromVertex  = 0.1
+    double ChiCut             = 130
+    InputTag recVertices      = pixelVertices:
+    bool UseQuality = true
+    string TrackQuality ="highPurity"
+    string TrackAlgorithm="iter2"   
+}
+
 
 sequence secondStep ={
     secClusters
