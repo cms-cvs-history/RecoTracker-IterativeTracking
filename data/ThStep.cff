@@ -1,11 +1,4 @@
 ##HIT REMOVAL
-#module thClusters = RemainingClusterProducer{
-#    InputTag matchedRecHits    = secStripRecHits:matchedRecHit
-#    InputTag rphirecHits       = secStripRecHits:rphiRecHit
-#    InputTag stereorecHits     = secStripRecHits:stereoRecHit
-#    InputTag pixelHits         = secPixelRecHits:
-#    InputTag recTracks         = secStep:
-#}
 
 module thClusters = TrackClusterRemover{
     InputTag stripClusters = secClusters
@@ -36,14 +29,15 @@ es_module thlayerpairs =  MixedLayerPairsESProducer {
 
   string ComponentName = "ThLayerPairs"
 
-    vstring layerList = { "BPix1+BPix2", "BPix1+BPix3", "BPix2+BPix3",
+    vstring layerList = { 
+	"BPix1+BPix2",
+	"BPix1+BPix3", "BPix2+BPix3",
 	"BPix1+FPix1_pos", "BPix1+FPix1_neg", "BPix1+FPix2_pos", "BPix1+FPix2_neg",
 	"BPix2+FPix1_pos", "BPix2+FPix1_neg", "BPix2+FPix2_pos", "BPix2+FPix2_neg",
 	"FPix1_pos+FPix2_pos", "FPix1_neg+FPix2_neg",
 	"FPix2_pos+TEC1_pos","FPix2_pos+TEC2_pos","TEC1_pos+TEC2_pos","TEC2_pos+TEC3_pos",
 	"FPix2_neg+TEC1_neg","FPix2_neg+TEC2_neg","TEC1_neg+TEC2_neg","TEC2_neg+TEC3_neg"
-	#PIXELLESS
-#	"TIB1+TIB2"
+
     }
     
   PSet BPix = {
@@ -61,33 +55,17 @@ es_module thlayerpairs =  MixedLayerPairsESProducer {
     double hitErrorRPhi = 0.0051 
     double hitErrorRZ   = 0.0036  
   }
-###PIXELLESS
-  PSet TIB1 = {
-    InputTag matchedRecHits = thStripRecHits:matchedRecHit
-    InputTag rphiRecHits    = thStripRecHits:rphiRecHit
-    untracked bool useSimpleRphiHitsCleaner = false
-    string TTRHBuilder        =  "WithTrackAngle"
-  }
-
-  PSet TIB2 = {
-    InputTag matchedRecHits = thStripRecHits:matchedRecHit
-    InputTag rphiRecHits    = thStripRecHits:rphiRecHit
-    untracked bool useSimpleRphiHitsCleaner = false
-    string TTRHBuilder        =  "WithTrackAngle"
-  }
 
 
-###END PIXELLESS
   PSet TEC = {
     InputTag matchedRecHits = thStripRecHits:matchedRecHit
     string TTRHBuilder        =  "WithTrackAngle"
     untracked bool useRingSlector = true
     int32 minRing = 1
     int32 maxRing = 1
-  }
-
+    }
+    
 }
-
 
 
 
@@ -111,9 +89,10 @@ replace thMeasurementTracker.stripClusterProducer = "thClusters"
 ##TRAJECTORY FILTER
 es_module thCkfTrajectoryFilter = trajectoryFilterESProducer from "TrackingTools/TrajectoryFiltering/data/TrajectoryFilterESProducer.cfi"
 replace thCkfTrajectoryFilter.ComponentName = "thCkfTrajectoryFilter"
-replace thCkfTrajectoryFilter.filterPset.maxLostHits = 1
+replace thCkfTrajectoryFilter.filterPset.maxLostHits = 0
 replace thCkfTrajectoryFilter.filterPset.minimumNumberOfHits = 3
 replace thCkfTrajectoryFilter.filterPset.minPt   = 0.3
+
 ##TRAJECTORY BUILDER
 es_module thCkfTrajectoryBuilder =
    GroupedCkfTrajectoryBuilder from "RecoTracker/CkfPattern/data/GroupedCkfTrajectoryBuilderESProducer.cfi"
@@ -126,7 +105,7 @@ module thTrackCandidates =
    ckfTrackCandidates from "RecoTracker/CkfPattern/data/CkfTrackCandidates.cfi"
 replace thTrackCandidates.SeedProducer= "thPLSeeds"
 replace thTrackCandidates.TrajectoryBuilder = "thCkfTrajectoryBuilder"
-
+replace thTrackCandidates.doSeedingRegionRebuilding = true
 
 ##TRACKS
 module thWithMaterialTracks = 

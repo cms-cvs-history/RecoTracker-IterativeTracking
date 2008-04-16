@@ -1,11 +1,5 @@
 ##HIT REMOVAL
-#module secClusters = RemainingClusterProducer{
-#    InputTag matchedRecHits    = siStripMatchedRecHits:matchedRecHit
-#    InputTag rphirecHits       = siStripMatchedRecHits:rphiRecHit
-#    InputTag stereorecHits     = siStripMatchedRecHits:stereoRecHit
-#    InputTag pixelHits         = siPixelRecHits:
-#    InputTag recTracks         = firstfilter:
-#}
+
 module secClusters = TrackClusterRemover{
     InputTag stripClusters = siStripClusters
     InputTag pixelClusters = siPixelClusters
@@ -29,98 +23,30 @@ replace secStripRecHits.ClusterProducer = "secClusters"
     
 
 ##SEEDING LAYERS
-#PAIRS
-es_module seclayerPairs =  MixedLayerPairsESProducer {
+#PIXEL
+es_module seclayertriplets = pixellayertriplets
+   from  "RecoTracker/TkSeedingLayers/data/PixelLayerTriplets.cfi" 
+replace seclayertriplets.ComponentName = "SecLayerTriplets"
+replace seclayertriplets.BPix.HitProducer = "secPixelRecHits"
+replace seclayertriplets.FPix.HitProducer = "secPixelRecHits"
 
-    string ComponentName = "SecLayerPairs"
+
+#TIB LAYERS
+es_module secPLlayertriplets = 
+MixedLayerTripletsESProducer {
+    string ComponentName = "SecPlLayerTriplets"
     
     vstring layerList = { 
-	"BPix1+BPix2", "BPix1+BPix3", "BPix2+BPix3",
-	"BPix1+FPix1_pos", "BPix1+FPix1_neg", "BPix1+FPix2_pos", "BPix1+FPix2_neg",
-	"BPix2+FPix1_pos", "BPix2+FPix1_neg", "BPix2+FPix2_pos", "BPix2+FPix2_neg",
-	"FPix1_pos+FPix2_pos", "FPix1_neg+FPix2_neg",
-	"FPix2_pos+TEC1_pos","FPix2_pos+TEC2_pos","TEC1_pos+TEC2_pos","TEC2_pos+TEC3_pos",
-	"FPix2_neg+TEC1_neg","FPix2_neg+TEC2_neg","TEC1_neg+TEC2_neg","TEC2_neg+TEC3_neg",
 	"TIB1+TIB2+TIB3"
     }
-    
-    PSet BPix = {
-	string HitProducer = "secPixelRecHits"  
-	string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
-	untracked bool useErrorsFromParam = true
-	double hitErrorRPhi = 0.0027  
-	double hitErrorRZ   = 0.0060 
-    }
-    
-    PSet FPix = {
-	string HitProducer = "secPixelRecHits"  
-	string TTRHBuilder = "TTRHBuilderWithoutAngle4MixedPairs" 
-	untracked bool useErrorsFromParam = true
-	double hitErrorRPhi = 0.0051 
-	double hitErrorRZ   = 0.0036  
-    }
-    
-    PSet TEC = {
-	InputTag matchedRecHits = secStripRecHits:matchedRecHit
-	string TTRHBuilder        =  "WithTrackAngle"
-	untracked bool useRingSlector = true
-	int32 minRing = 1
-	int32 maxRing = 1
-    }
-    PSet TIB1 = {
+    PSet TIB = {
 	InputTag matchedRecHits = secStripRecHits:matchedRecHit
 	InputTag rphiRecHits    = secStripRecHits:rphiRecHit
 	untracked bool useSimpleRphiHitsCleaner = false
 	string TTRHBuilder        =  "WithTrackAngle"
     }
     
-    PSet TIB2 = {
-	InputTag matchedRecHits = secStripRecHits:matchedRecHit
-	InputTag rphiRecHits    = secStripRecHits:rphiRecHit
-	untracked bool useSimpleRphiHitsCleaner = false
-	string TTRHBuilder        =  "WithTrackAngle"
-    }
-    PSet TIB3 = {
-#	InputTag matchedRecHits = secStripRecHits:matchedRecHit
-	InputTag rphiRecHits    = secStripRecHits:rphiRecHit
-	untracked bool useSimpleRphiHitsCleaner = false
-	string TTRHBuilder        =  "WithTrackAngle"
-    }
 }
-
-
-
-#TRIPLETS
-
-
-es_module seclayertriplets =  PixelLayerTripletsESProducer {
-
-  string ComponentName = "SecLayerTriplets"
-
-  vstring layerList = { "BPix1+BPix2+BPix3",
-                        "BPix1+BPix2+FPix1_pos",
-                        "BPix1+BPix2+FPix1_neg",
-                        "BPix1+FPix1_pos+FPix2_pos",
-                        "BPix1+FPix1_neg+FPix2_neg"
-  }
-  PSet BPix = {
-    string HitProducer = "secPixelRecHits"
-    string TTRHBuilder = "TTRHBuilderWithoutAngle4PixelTriplets"
-    untracked bool useErrorsFromParam = true
-    double hitErrorRPhi = 0.0027
-    double hitErrorRZ   = 0.0060
-  }
-
-  PSet FPix = {
-    string HitProducer = "secPixelRecHits"
-    string TTRHBuilder = "TTRHBuilderWithoutAngle4PixelTriplets"
-    untracked bool useErrorsFromParam = true
-    double hitErrorRPhi = 0.0051
-    double hitErrorRZ   = 0.0036
-  }
-}
-
-
 
 
 ##SEEDS
@@ -131,9 +57,42 @@ replace secTriplets.RegionFactoryPSet.RegionPSet.originHalfLength = 22.7
 replace secTriplets.OrderedHitsFactoryPSet.SeedingLayers = "SecLayerTriplets"
 replace secTriplets.RegionFactoryPSet.RegionPSet.ptMin = 0.3
 
+#TRIPLETS
+#module secPlTriplets = globalSeedsFromTripletsWithVertices
+#from "RecoTracker/TkSeedGenerator/data/GlobalSeedsFromTripletsWithVertices.cfi"
+#replace secPlTriplets.RegionFactoryPSet.RegionPSet.originHalfLength = 22.7
+#replace secPlTriplets.OrderedHitsFactoryPSet.SeedingLayers = "SecPlLayerTriplets"
+#replace secPlTriplets.RegionFactoryPSet.RegionPSet.ptMin = 0.3
+#replace secPlTriplets.OrderedHitsFactoryPSet.GeneratorPSet.extraHitRZtolerance =5
+module secPlTriplets = SeedGeneratorFromRegionHitsEDProducer {
+  PSet RegionFactoryPSet = {
+    string ComponentName = "GlobalRegionProducer"
+    include "RecoTracker/TkTrackingRegions/data/GlobalTrackingRegion.cfi"
+  }
+  PSet SeedComparitorPSet = { string ComponentName = "none" }
+
+  PSet OrderedHitsFactoryPSet = {
+    string ComponentName = "StandardHitTripletGenerator"
+    string SeedingLayers = "SecPlLayerTriplets"
+	PSet GeneratorPSet = {
+	    string ComponentName = "StripTripletGenerator"
+	    bool useFixedPreFiltering = true
+	    double phiPreFiltering = 0.3          # can be removed if !useFixedPreFiltering
+	    double extraHitRZtolerance   = 12.06
+	    double extraHitRPhitolerance = 0.06
+	    bool useBending = true
+	    bool useMultScattering = true
+	}
+    }
+    
+}
 
 
-
+#COMBINED 
+module secCombSeeds = globalCombinedSeeds
+from "RecoTracker/TkSeedGenerator/data/GlobalCombinedSeeds.cfi"
+replace secCombSeeds.PairCollection = secTriplets
+replace secCombSeeds.TripletCollection = secPlTriplets
 
 ##TRAJECTORY MEASUREMENT
 es_module secMeasurementTracker =
@@ -161,9 +120,10 @@ replace secCkfTrajectoryBuilder.trajectoryFilterName = "secCkfTrajectoryFilter"
 ##TRACK CANDIDATES
 module secTrackCandidates =
    ckfTrackCandidates from "RecoTracker/CkfPattern/data/CkfTrackCandidates.cfi"
-replace secTrackCandidates.SeedProducer= "secTriplets"
+replace secTrackCandidates.SeedProducer= "secCombSeeds"
+#replace secTrackCandidates.SeedProducer= "secPlTriplets"
 replace secTrackCandidates.TrajectoryBuilder = "secCkfTrajectoryBuilder"
-
+replace secTrackCandidates.doSeedingRegionRebuilding = true 
 
 ##TRACKS
 module secWithMaterialTracks = 
@@ -182,6 +142,8 @@ sequence secondStep ={
     ,secPixelRecHits
     ,secStripRecHits
     ,secTriplets
+    ,secPlTriplets
+    ,secCombSeeds
     ,secTrackCandidates
     ,secWithMaterialTracks
     ,secStep
