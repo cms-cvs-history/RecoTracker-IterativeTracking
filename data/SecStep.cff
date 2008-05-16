@@ -103,6 +103,8 @@ replace secTrackCandidates.SeedProducer= "secCombSeeds"
 #replace secTrackCandidates.SeedProducer= "secPlTriplets"
 replace secTrackCandidates.TrajectoryBuilder = "secCkfTrajectoryBuilder"
 replace secTrackCandidates.doSeedingRegionRebuilding = true 
+replace secTrackCandidates.useHitsSplitting = true
+
 
 ##TRACKS
 module secWithMaterialTracks = 

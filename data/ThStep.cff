@@ -106,6 +106,7 @@ module thTrackCandidates =
 replace thTrackCandidates.SeedProducer= "thPLSeeds"
 replace thTrackCandidates.TrajectoryBuilder = "thCkfTrajectoryBuilder"
 replace thTrackCandidates.doSeedingRegionRebuilding = true
+replace thTrackCandidates.useHitsSplitting = true
 
 ##TRACKS
 module thWithMaterialTracks = 
