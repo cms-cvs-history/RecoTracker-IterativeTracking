@@ -31,22 +31,6 @@ replace seclayertriplets.BPix.HitProducer = "secPixelRecHits"
 replace seclayertriplets.FPix.HitProducer = "secPixelRecHits"
 
 
-#TIB LAYERS
-es_module secPLlayertriplets = 
-MixedLayerTripletsESProducer {
-    string ComponentName = "SecPlLayerTriplets"
-    
-    vstring layerList = { 
-	"TIB1+TIB2+TIB3"
-    }
-    PSet TIB = {
-	InputTag matchedRecHits = secStripRecHits:matchedRecHit
-	InputTag rphiRecHits    = secStripRecHits:rphiRecHit
-	untracked bool useSimpleRphiHitsCleaner = false
-	string TTRHBuilder        =  "WithTrackAngle"
-    }
-    
-}
 
 
 ##SEEDS
@@ -57,21 +41,7 @@ replace secTriplets.RegionFactoryPSet.RegionPSet.originHalfLength = 22.7
 replace secTriplets.OrderedHitsFactoryPSet.SeedingLayers = "SecLayerTriplets"
 replace secTriplets.RegionFactoryPSet.RegionPSet.ptMin = 0.3
 
-#TRIPLETS
-module secPlTriplets = globalSeedsFromTripletsWithVertices
-from "RecoTracker/TkSeedGenerator/data/GlobalSeedsFromTripletsWithVertices.cfi"
-replace secPlTriplets.RegionFactoryPSet.RegionPSet.originHalfLength = 22.7
-replace secPlTriplets.OrderedHitsFactoryPSet.SeedingLayers = "SecPlLayerTriplets"
-replace secPlTriplets.RegionFactoryPSet.RegionPSet.ptMin = 0.3
-replace secPlTriplets.OrderedHitsFactoryPSet.GeneratorPSet.extraHitRZtolerance =12.0
 
-
-
-#COMBINED 
-module secCombSeeds = globalCombinedSeeds
-from "RecoTracker/TkSeedGenerator/data/GlobalCombinedSeeds.cfi"
-replace secCombSeeds.PairCollection = secTriplets
-replace secCombSeeds.TripletCollection = secPlTriplets
 
 ##TRAJECTORY MEASUREMENT
 es_module secMeasurementTracker =
@@ -99,8 +69,7 @@ replace secCkfTrajectoryBuilder.trajectoryFilterName = "secCkfTrajectoryFilter"
 ##TRACK CANDIDATES
 module secTrackCandidates =
    ckfTrackCandidates from "RecoTracker/CkfPattern/data/CkfTrackCandidates.cfi"
-replace secTrackCandidates.SeedProducer= "secCombSeeds"
-#replace secTrackCandidates.SeedProducer= "secPlTriplets"
+replace secTrackCandidates.SeedProducer= "secTriplets"
 replace secTrackCandidates.TrajectoryBuilder = "secCkfTrajectoryBuilder"
 replace secTrackCandidates.doSeedingRegionRebuilding = true 
 replace secTrackCandidates.useHitsSplitting = true
@@ -123,8 +92,6 @@ sequence secondStep ={
     ,secPixelRecHits
     ,secStripRecHits
     ,secTriplets
-    ,secPlTriplets
-    ,secCombSeeds
     ,secTrackCandidates
     ,secWithMaterialTracks
     ,secStep
