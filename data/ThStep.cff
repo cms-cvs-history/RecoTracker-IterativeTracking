@@ -75,7 +75,7 @@ module thPLSeeds  =  globalMixedSeeds from
 "RecoTracker/TkSeedGenerator/data/GlobalMixedSeeds.cfi"
 replace thPLSeeds.OrderedHitsFactoryPSet.SeedingLayers = "ThLayerPairs"
 replace thPLSeeds.RegionFactoryPSet.RegionPSet.ptMin = 0.3
-replace thPLSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 22.7
+replace thPLSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 17.5
  
 
 

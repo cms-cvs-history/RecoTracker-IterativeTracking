@@ -37,7 +37,7 @@ replace seclayertriplets.FPix.HitProducer = "secPixelRecHits"
 #TRIPLETS
 module secTriplets = globalSeedsFromTripletsWithVertices
 from "RecoTracker/TkSeedGenerator/data/GlobalSeedsFromTripletsWithVertices.cfi"
-replace secTriplets.RegionFactoryPSet.RegionPSet.originHalfLength = 22.7
+replace secTriplets.RegionFactoryPSet.RegionPSet.originHalfLength = 17.5
 replace secTriplets.OrderedHitsFactoryPSet.SeedingLayers = "SecLayerTriplets"
 replace secTriplets.RegionFactoryPSet.RegionPSet.ptMin = 0.3
 
