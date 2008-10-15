@@ -1,4 +1,0 @@
-include "RecoTracker/IterativeTracking/data/FirstFilter.cfi"
-include "RecoTracker/IterativeTracking/data/SecStep.cff"
-include "RecoTracker/IterativeTracking/data/ThStep.cff"
-sequence iterTracking ={firstfilter,secondStep,thirdStep}
