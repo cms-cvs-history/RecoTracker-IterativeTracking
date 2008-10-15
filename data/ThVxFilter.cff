@@ -1,5 +1,0 @@
-module thStep =
- vertFilter from "RecoParticleFlow/PFTracking/data/vertexFilter.cfi"
-replace  thStep.recTracks     = thWithMaterialTracks:
-replace  thStep.DistZFromVertex    = 0.1
-replace  thStep.TrackAlgorithm="iter3"
