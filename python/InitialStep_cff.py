@@ -14,7 +14,7 @@ initialStepSeeds = RecoTracker.TkSeedGenerator.GlobalSeedsFromTriplets_cff.globa
     ComponentName = cms.string('GlobalRegionProducerFromBeamSpot'),
     RegionPSet = RegionPsetFomBeamSpotBlock.RegionPSet.clone(
     ptMin = 0.6,
-    originRadius = 0.03,
+    originRadius = 0.02,
     nSigmaZ = 4.0
     )
     )
@@ -28,15 +28,24 @@ initialStepTrajectoryFilter = TrackingTools.TrajectoryFiltering.TrajectoryFilter
     ComponentName = 'initialStepTrajectoryFilter',
     filterPset = TrackingTools.TrajectoryFiltering.TrajectoryFilterESProducer_cfi.trajectoryFilterESProducer.filterPset.clone(
     minimumNumberOfHits = 3,
-    maxLostHits = 0,
-    minPt = 0.4
+    minPt = 0.2
     )
     )
+
+import TrackingTools.KalmanUpdators.Chi2MeasurementEstimatorESProducer_cfi
+initialStepChi2Est = TrackingTools.KalmanUpdators.Chi2MeasurementEstimatorESProducer_cfi.Chi2MeasurementEstimator.clone(
+    ComponentName = cms.string('initialStepChi2Est'),
+    nSigma = cms.double(3.0),
+    MaxChi2 = cms.double(9.0)
+)
 
 import RecoTracker.CkfPattern.GroupedCkfTrajectoryBuilderESProducer_cfi
 initialStepTrajectoryBuilder = RecoTracker.CkfPattern.GroupedCkfTrajectoryBuilderESProducer_cfi.GroupedCkfTrajectoryBuilder.clone(
     ComponentName = 'initialStepTrajectoryBuilder',
-    trajectoryFilterName = 'initialStepTrajectoryFilter'
+    trajectoryFilterName = 'initialStepTrajectoryFilter',
+    alwaysUseInvalidHits = True,
+    maxCand = 3,
+    estimator = cms.string('initialStepChi2Est')
     )
 
 import RecoTracker.CkfPattern.CkfTrackCandidates_cfi
