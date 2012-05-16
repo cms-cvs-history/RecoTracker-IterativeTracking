@@ -91,7 +91,7 @@ detachedTripletStepTrackCandidates = RecoTracker.CkfPattern.CkfTrackCandidates_c
 # TRACK FITTING
 import RecoTracker.TrackProducer.TrackProducer_cfi
 detachedTripletStepTracks = RecoTracker.TrackProducer.TrackProducer_cfi.TrackProducer.clone(
-    AlgorithmName = cms.string('iter3'),
+    AlgorithmName = cms.string('iter4'),
     src = 'detachedTripletStepTrackCandidates'
     )
 
