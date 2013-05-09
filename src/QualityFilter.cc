@@ -110,11 +110,20 @@ QualityFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       for ( unsigned index = 0; index<nTracks; ++index ) { 
 
         reco::Track& aTrack = selTracks->at(index);
-        TrackExtra aTrackExtra(aTrack.outerPosition(),
-                               aTrack.outerMomentum(),
-                               aTrack.outerOk(),
-                               aTrack.innerPosition(),
-                               aTrack.innerMomentum(),
+        // move to reduced extra format (AA)
+//        TrackExtra aTrackExtra(aTrack.outerPosition(),
+//                               aTrack.outerMomentum(),
+//                               aTrack.outerOk(),
+//                               aTrack.innerPosition(),
+//                               aTrack.innerMomentum(),
+//                               aTrack.innerOk(),
+//                               aTrack.outerStateCovariance(),
+//                               aTrack.outerDetId(),
+//                               aTrack.innerStateCovariance(),
+//                               aTrack.innerDetId(),
+//                               aTrack.seedDirection(),
+//                               aTrack.seedRef());
+        TrackExtra aTrackExtra(aTrack.outerOk(),
                                aTrack.innerOk(),
                                aTrack.outerStateCovariance(),
                                aTrack.outerDetId(),
@@ -122,7 +131,7 @@ QualityFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                                aTrack.innerDetId(),
                                aTrack.seedDirection(),
                                aTrack.seedRef());
-            
+
 
         //unsigned nHits = aTrack.numberOfValidHits();
         unsigned nHits = aTrack.recHitsSize();
